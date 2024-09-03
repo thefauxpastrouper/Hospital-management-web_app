@@ -1,25 +1,28 @@
 const Inventory = require('../models/inventory');
 
-exports.getAllItems = async (req, res) => {
+// Get all inventory items
+exports.getAllItems = async (req, res, next) => {
     try {
         const items = await Inventory.find();
         res.status(200).send(items);
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };
 
-exports.addItem = async (req, res) => {
+// Add a new item to inventory
+exports.addItem = async (req, res, next) => {
     try {
         const item = new Inventory(req.body);
         await item.save();
         res.status(201).send(item);
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };
 
-exports.updateItem = async (req, res) => {
+// Update an existing inventory item
+exports.updateItem = async (req, res, next) => {
     try {
         const item = await Inventory.findById(req.params.id);
         if (!item) return res.status(404).send('Item not found');
@@ -30,17 +33,18 @@ exports.updateItem = async (req, res) => {
         await item.save();
         res.status(200).send(item);
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };
 
-exports.deleteItem = async (req, res) => {
+// Delete an inventory item
+exports.deleteItem = async (req, res, next) => {
     try {
         const item = await Inventory.findByIdAndDelete(req.params.id);
         if (!item) return res.status(404).send('Item not found');
 
         res.status(200).send({ message: 'Item deleted successfully' });
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };

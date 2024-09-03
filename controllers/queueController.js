@@ -1,16 +1,18 @@
 const Queue = require('../models/queue');
 const Patient = require('../models/patient');
 
-exports.getAllQueues = async (req, res) => {
+// Get all queues
+exports.getAllQueues = async (req, res, next) => {
     try {
         const queues = await Queue.find().populate('patient');
         res.status(200).send(queues);
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };
 
-exports.addToQueue = async (req, res) => {
+// Add a patient to the queue
+exports.addToQueue = async (req, res, next) => {
     try {
         const { patientId, priority } = req.body;
 
@@ -23,11 +25,12 @@ exports.addToQueue = async (req, res) => {
 
         res.status(201).send(queue);
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };
 
-exports.updateQueue = async (req, res) => {
+// Update a queue entry
+exports.updateQueue = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
@@ -40,11 +43,12 @@ exports.updateQueue = async (req, res) => {
 
         res.status(200).send(queue);
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };
 
-exports.removeFromQueue = async (req, res) => {
+// Remove a patient from the queue
+exports.removeFromQueue = async (req, res, next) => {
     try {
         const { id } = req.params;
         const queue = await Queue.findByIdAndDelete(id);
@@ -52,6 +56,6 @@ exports.removeFromQueue = async (req, res) => {
 
         res.status(200).send({ message: 'Patient removed from queue' });
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };

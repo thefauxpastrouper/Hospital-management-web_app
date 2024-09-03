@@ -4,8 +4,18 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const app = require('./app');
 
+const errorHandler = require('./middlewares/errorHandler');
+
+// Middleware for parsing JSON bodies
+app.use(express.json());
+
+// Define your routes
+// e.g., app.use('/beds', require('./routes/beds'));
+
+// Use global error handler middleware
+app.use(errorHandler);
 // MongoDB Connection
-mongoose.connect('', {
+mongoose.connect('mongodb+srv://admin:bY5RKYwB3ZwJS7rr@cluster0.vpysw.mongodb.net/', {
     
 }).then(() => console.log('MongoDB connected...'))
   .catch(err => console.log('Error connecting to MongoDB:', err));

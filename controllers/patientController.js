@@ -1,27 +1,30 @@
 const Patient = require('../models/patient');
 const Bed = require('../models/bed');
 
-exports.getAllPatients = async (req, res) => {
+// Get all patients
+exports.getAllPatients = async (req, res, next) => {
     try {
         const patients = await Patient.find().populate('bed');
         res.status(200).send(patients);
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };
 
-exports.getPatientById = async (req, res) => {
+// Get patient by ID
+exports.getPatientById = async (req, res, next) => {
     try {
         const patient = await Patient.findById(req.params.id).populate('bed');
         if (!patient) return res.status(404).send('Patient not found');
 
         res.status(200).send(patient);
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };
 
-exports.addPatient = async (req, res) => {
+// Add a new patient
+exports.addPatient = async (req, res, next) => {
     try {
         const { name, urgency, appointmentTime, isEmergency, status, admissionDate, bedId, treatments } = req.body;
 
@@ -36,11 +39,12 @@ exports.addPatient = async (req, res) => {
 
         res.status(201).send(patient);
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };
 
-exports.updatePatient = async (req, res) => {
+// Update an existing patient
+exports.updatePatient = async (req, res, next) => {
     try {
         const { id } = req.params;
         const updates = req.body;
@@ -50,7 +54,7 @@ exports.updatePatient = async (req, res) => {
 
         res.status(200).send(patient);
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        next(err); // Pass error to global error handler
     }
 };
 
