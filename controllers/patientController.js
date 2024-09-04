@@ -1,60 +1,101 @@
 const Patient = require('../models/patient');
 const Bed = require('../models/bed');
 
+
+
+exports.addPatient = async (req, res) => {
+    // Explicitly check for each required field
+    const { name, age, mobileNo, address, fees, disease } = req.body;
+
+    if (name && age && mobileNo && address && fees && disease) {
+        try {
+            const patient = new Patient({
+                name,
+                age,
+                mobileNo,
+                address,
+                fees,
+                disease
+            });
+
+            const savedPatient=await patient.save(); // Save the patient data to the database
+            console.log('Patient saved:', savedPatient);
+            res.status(200).json({ result: "Success" }); // Respond with success status
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ result: "Error saving patient data", error: error.message }); // Handle server errors
+        }
+    } else {
+        res.status(400).json({ result: "FAILED", message: "All fields are required" }); // Respond with a bad request status
+    }
+};
+
+
 // Get all patients
 exports.getAllPatients = async (req, res, next) => {
     try {
-        const patients = await Patient.find().populate('bed');
+        const patients = await Patient.find();
         res.status(200).send(patients);
     } catch (err) {
         next(err); // Pass error to global error handler
     }
 };
 
-// Get patient by ID
-exports.getPatientById = async (req, res, next) => {
-    try {
-        const patient = await Patient.findById(req.params.id).populate('bed');
-        if (!patient) return res.status(404).send('Patient not found');
-
-        res.status(200).send(patient);
-    } catch (err) {
-        next(err); // Pass error to global error handler
-    }
+exports.getPatientByName = (req, res) => {
+    const patientName = req.params.name; // Accessing the captured name value
+    Patient.find({ name: patientName })
+        .then(patients => {
+            if (!patients) {
+                return res.status(404).json({ message: 'Patient not found' });
+            }
+            res.json(patients);
+        })
+        .catch(error => res.status(500).json({ error: error.message }));
 };
 
-// Add a new patient
-exports.addPatient = async (req, res, next) => {
+exports.getPatientById = async (req, res) => {
     try {
-        const { name, urgency, appointmentTime, isEmergency, status, admissionDate, bedId, treatments } = req.body;
+        const id = req.params.id;
 
-        // Validate if bed exists
-        if (bedId) {
-            const bed = await Bed.findById(bedId);
-            if (!bed) return res.status(404).send('Bed not found');
+        // Validate the ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ result: 'Invalid ID format' });
         }
 
-        const patient = new Patient({ name, urgency, appointmentTime, isEmergency, status, admissionDate, bed: bedId, treatments });
-        await patient.save();
+        // Fetch the patient by ID
+        const patient = await Patient.findById(id);
 
-        res.status(201).send(patient);
+        // Check if the patient was found
+        if (!patient) {
+            return res.status(404).json({ result: 'Patient not found' });
+        }
+
+        // Return the patient details
+        res.status(200).json(patient);
     } catch (err) {
-        next(err); // Pass error to global error handler
+        console.error('Error querying patient:', err);
+        res.status(500).json({ result: 'Server error' });
     }
 };
 
+
+
+
+
+
 // Update an existing patient
-exports.updatePatient = async (req, res, next) => {
+exports.updatePatient = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id; // Extract the id from URL parameters
+        console.log(id);
         const updates = req.body;
 
-        const patient = await Patient.findByIdAndUpdate(id, updates, { new: true }).populate('bed');
+        const patient = await Patient.findByIdAndUpdate(id, updates, { new: true });
         if (!patient) return res.status(404).send('Patient not found');
 
-        res.status(200).send(patient);
+        res.status(200).json(patient);
     } catch (err) {
-        next(err); // Pass error to global error handler
+        res.status(500).json({ result: 'error' });
     }
 };
 
