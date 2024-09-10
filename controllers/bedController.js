@@ -38,8 +38,7 @@ exports.addBed = async (req, res, next) => {
 // Update bed status
 exports.updateBedStatus = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const { isOccupied, patientId } = req.body;
+        const { id, isOccupied, patientId } = req.body;
 
         const bed = await Bed.findById(id);
         if (!bed) return res.status(404).send('Bed not found');

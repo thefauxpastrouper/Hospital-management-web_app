@@ -9,9 +9,9 @@ router.get('/all', queueController.getAllQueues);
 router.post('/add', queueController.addToQueue);
 
 // Update the status of a patient in the queue (e.g., moved to "seen")
-router.patch('/:id', queueController.updateQueue);
+router.patch('/update', queueController.updateQueue);
 
 // Remove a patient from the queue
-router.delete('/:id', queueController.removeFromQueue);
+router.delete('/delete', queueController.removeFromQueue);
 
 module.exports = router;

@@ -20,7 +20,12 @@ exports.addPatient = async (req, res) => {
 
             const savedPatient=await patient.save(); // Save the patient data to the database
             console.log('Patient saved:', savedPatient);
-            res.status(200).json({ result: "Success" }); // Respond with success status
+            res.status(201).json({
+                success: true,
+                message: 'Patient created successfully',
+                patientId: patient._id, // Sending the generated _id back in the response
+                data: patient
+            }); // Respond with success status
         } catch (error) {
             console.error(error);
             res.status(500).json({ result: "Error saving patient data", error: error.message }); // Handle server errors

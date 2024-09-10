@@ -12,6 +12,6 @@ router.get('/available', bedController.getAvailableBeds);
 router.post('/add', bedController.addBed);
 
 // Update bed status (e.g., occupied or freed up)
-router.patch('/:id', bedController.updateBedStatus);
+router.patch('/update', bedController.updateBedStatus);
 
 module.exports = router;
